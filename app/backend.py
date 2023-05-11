@@ -4,7 +4,6 @@ import mysql.connector
 app = Flask(__name__)
 
 @app.route('/data')
-print("hello")
 def get_data():
     # Connect to the MySQL DB instance
     cnx = mysql.connector.connect(user='admin', password='Arby_13245',
@@ -22,8 +21,15 @@ def get_data():
     
     # Return the retrieved data as a JSON response
     return jsonify(data)
+    
+@app.route('/')
+def home():
+    print("hello")
+    return "hello"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+    
+    
 
 
