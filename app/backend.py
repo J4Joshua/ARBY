@@ -4,6 +4,7 @@ import mysql.connector
 app = Flask(__name__)
 
 @app.route('/data')
+print("hello")
 def get_data():
     # Connect to the MySQL DB instance
     cnx = mysql.connector.connect(user='admin', password='Arby_13245',
