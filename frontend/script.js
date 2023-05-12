@@ -1,0 +1,16 @@
+$.ajax({
+  url: "http://192.168.5.45:5000/data",
+  type: "GET",
+  dataType: "json",
+  success: function(data) {
+    // Do something with the retrieved data
+    var array = data[0];
+    $('#id1').append(array[0]);
+    $('#name1').append(array[1]);
+    console.log(data);
+  },
+  error: function(jqXHR, textStatus, errorThrown) {
+    // Handle any errors
+    console.log("Error:", textStatus, errorThrown);
+  }
+});

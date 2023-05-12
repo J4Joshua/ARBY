@@ -1,10 +1,16 @@
 from flask import Flask, jsonify
 import mysql.connector
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
 
 @app.route('/data')
 def get_data():
+    # Listen for requests
+
+    
     # Connect to the MySQL DB instance
     cnx = mysql.connector.connect(user='admin', password='Arby_13245',
                                    host='arbydb.camodfosky75.ap-southeast-1.rds.amazonaws.com', database='ARBY')
