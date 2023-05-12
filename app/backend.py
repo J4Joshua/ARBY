@@ -1,5 +1,6 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_file
 import mysql.connector
+import boto3
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -9,6 +10,7 @@ CORS(app)
 @app.route('/data')
 def get_data():
     # Listen for requests
+
 
     
     # Connect to the MySQL DB instance
@@ -30,8 +32,10 @@ def get_data():
     
 @app.route('/')
 def home():
-    print("hello")
-    return "hello"
+    s3 = boto3.client('s3')
+    s3.download_file('arbybucket', 'index.html', '/tmp/index.html')
+    return send_file('/tmp/index.html', mimetype='text/html')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
