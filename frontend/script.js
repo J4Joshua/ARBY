@@ -1,5 +1,5 @@
 $.ajax({
-  url: "http://54.179.120.53:5000/data",
+  url: "https://54.179.120.53/data",
   type: "GET",
   dataType: "json",
   success: function(data) {
