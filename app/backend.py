@@ -6,13 +6,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-
 @app.route('/data')
 def get_data():
-    # Listen for requests
-
-
-    
     # Connect to the MySQL DB instance
     cnx = mysql.connector.connect(user='admin', password='Arby_13245',
                                    host='arbydb.camodfosky75.ap-southeast-1.rds.amazonaws.com', database='ARBY')
@@ -29,6 +24,21 @@ def get_data():
     
     # Return the retrieved data as a JSON response
     return jsonify(data)
+    
+# Access Binance API
+BASE_URL = 'https://api.binance.com/api/v3'
+ENDPOINTS = {
+    'klines': '/klines',
+    'ticker_price': '/ticker/price',
+    'ticker_book': '/ticker/bookTicker'
+}
+
+@app.route('/api/ticker/book')
+def get_ticker_book():
+    symbol = request.args.get('symbol', 'BTCUSDT')
+    params = {'symbol': symbol}
+    response = requests.get(BASE_URL + ENDPOINTS['ticker_book'], params=params)
+    return jsonify(response.json())
     
 @app.route('/')
 def home():
