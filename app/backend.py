@@ -2,6 +2,7 @@ from flask import Flask, jsonify, send_file, request
 import mysql.connector
 import boto3
 import requests
+import json
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -34,12 +35,18 @@ ENDPOINTS = {
     'ticker_book': '/ticker/bookTicker'
 }
 
+
 @app.route('/api/ticker/book')
 def get_ticker_book():
-    symbol = request.args.get('symbol', 'BTCUSDT')
-    params = {'symbol': symbol}
-    response = requests.get(BASE_URL + ENDPOINTS['ticker_book'], params=params)
-    return jsonify(response.json())
+
+    symbol_list = ['BTCUSDT','ETHUSDT','BNBUSDT','BTCTUSD','PEPEUSDT']
+    response_list = []
+    for symbol in symbol_list :
+        params = {'symbol': symbol}
+        response = requests.get(BASE_URL + ENDPOINTS['ticker_book'], params=params)
+        response_data = response.json()
+        response_list.append(response_data)
+    return jsonify(rows=response_list)
     
 @app.route('/')
 def home():
