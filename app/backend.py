@@ -3,30 +3,57 @@ import mysql.connector
 import boto3
 import requests
 import json
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
+
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/data')
-def get_data():
-    # Connect to the MySQL DB instance
-    cnx = mysql.connector.connect(user='admin', password='Arby_13245',
-                                   host='arbydb.camodfosky75.ap-southeast-1.rds.amazonaws.com', database='ARBY')
+
+# Connect to the MySQL DB instance
+cnx = mysql.connector.connect(user='admin', password='Arby_13245',
+                               host='arbydb.camodfosky75.ap-southeast-1.rds.amazonaws.com', database='ARBY')
+# Execute an SQL query to retrieve data from the table
+cursor = cnx.cursor()
+
+
+# Add User to database
+def add_user(username):
+    query = "INSERT INTO `ARBY`.`users` (`Username`) VALUES (%s)"
+    cursor.execute(query, (username,))
+    # ticker = json.dumps(['BTCUSDT'])
+    # cursor.execute("INSERT INTO `ARBY`.`users` (`Tickers`) VALUES CAST(%s AS BLOB))", (ticker,))
+    cnx.commit()
+    return
+
+
+
+@app.route('/check_user', methods=['POST'])
+def check_user():
+    # Get the username from the frontend
+    content = request.json
+    username = content['username']
+    method = content['method']
     
-    # Execute an SQL query to retrieve data from the table
-    cursor = cnx.cursor()
-    query = 'SELECT * FROM Tokens'
-    cursor.execute(query)
-    data = cursor.fetchall()
+    # Query the MySQL database to check if User already exists
+    cursor.execute("SELECT * FROM users WHERE username=%s", (username,))
+    user_data = cursor.fetchall()
     
-    # Close the database connection
-    cnx.close()
-    print(data)
-    
-    # Return the retrieved data as a JSON response
-    return jsonify(data)
-    
+    # Add user if doesn't yet exist
+    if method == 'register':
+        if not user_data:
+            add_user(username)
+            return jsonify({'status': 'success', 'message': 'User added'})
+        else:
+            return jsonify({'status': 'error', 'message': 'Already registered'})
+    else:
+        if not user_data:
+            return jsonify({'status': 'error', 'message': 'User not registered'})
+        else:
+            return jsonify({'status': 'success', 'message': 'Success', 'user_data': user_data})
+
+
+
 # Access Binance API
 BASE_URL = 'https://api.binance.com/api/v3'
 ENDPOINTS = {
@@ -34,25 +61,43 @@ ENDPOINTS = {
     'ticker_price': '/ticker/price',
     'ticker_book': '/ticker/bookTicker'
 }
-
-
-@app.route('/api/ticker/book')
-def get_ticker_book():
-
-    symbol_list = ['BTCUSDT','ETHUSDT','BNBUSDT','BTCTUSD','PEPEUSDT']
+def get_ticker_book(symbol_list):
     response_list = []
     for symbol in symbol_list :
+        
         params = {'symbol': symbol}
         response = requests.get(BASE_URL + ENDPOINTS['ticker_book'], params=params)
         response_data = response.json()
+        print(response_data)
+        if 'symbol' not in response_data:
+            return jsonify(status='error')
         response_list.append(response_data)
-    return jsonify(rows=response_list)
+    return jsonify(rows=response_list,status='success')
+symbol_list = ['BTCUSDT']
+
+@app.route('/getdata')
+def get_pair():
+    return get_ticker_book(symbol_list)
+
+@app.route('/addpair', methods=['POST'])
+def add_pair():
+    content = request.json
+    pairname = content['pairname']
+    symbol_list.append(pairname)
+    return get_ticker_book(symbol_list)
+
+@app.route('/removepair', methods=['POST'])
+def remove_pair():
+    content = request.json
+    pairname = content['pairname']
+    symbol_list.remove(pairname)
+    return get_ticker_book(symbol_list)
     
+
+
 @app.route('/')
 def home():
-    s3 = boto3.client('s3')
-    s3.download_file('arbybucket', 'index.html', '/tmp/index.html')
-    return send_file('/tmp/index.html', mimetype='text/html')
+    return
 
 
 if __name__ == '__main__':
