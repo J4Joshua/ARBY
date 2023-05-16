@@ -1,13 +1,18 @@
+
+var jwtToken = localStorage.getItem('jwtToken');
 get_data();
+
 $(document).ready(function() {
     $('#registerBtn').click(function() {
         // Get the username from the form
         const username = $('#username').val();
+        const password = $('#password').val();
         $('#username').val("");
+        $('#password').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://54.179.120.53:5000/check_user',
-            data: JSON.stringify({username: username, method: 'register'}),
+            url: 'http://192.168.5.45:5000/check_user',
+            data: JSON.stringify({username: username, password: password, method: 'register'}),
             dataType: 'json',
             contentType:"application/json",
             success: function(data) {
@@ -21,19 +26,24 @@ $(document).ready(function() {
     });
     $('#loginBtn').click(function() {
         // Get the username from the form
-        const username = $('#username1').val();
-        $('#username1').val("");
+        const username = $('#username').val();
+        const password = $('#password').val();
+        $('#username').val("");
+        $('#password').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://54.179.120.53:5000/check_user',
-            data: JSON.stringify({username: username, method: 'login'}),
+            url: 'http://192.168.5.45:5000/check_user',
+            data: JSON.stringify({username: username, password: password, method: 'login'}),
             dataType: 'json',
             contentType:"application/json",
             success: function(data) {
                 if (data.status == 'success') {
-                    console.log(data.user_data)
+                    jwtToken = data.jwtToken
+                    localStorage.setItem('jwtToken', jwtToken);
+                    console.log(jwtToken)
                 }
                 console.log(data.message)
+                get_data()
 
             },
             error: function(xhr, textStatus, errorThrown) {
@@ -48,8 +58,11 @@ $(document).ready(function() {
         $('#pairname').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://54.179.120.53:5000/addpair',
-            data: JSON.stringify({pairname: pairname}),
+            url: 'http://192.168.5.45:5000/addpair',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            },
+            data: JSON.stringify({pairname: pairname, jwtToken: jwtToken}),
             dataType: 'json',
             contentType:"application/json",
             success: function(data) {
@@ -63,12 +76,15 @@ $(document).ready(function() {
     });
     $('#deleteBtn').click(function() {
         // Get the username from the form
-        const pairname = $('#pairname1').val();
-        $('#pairname1').val("");
+        const pairname = $('#pairname').val();
+        $('#pairname').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://54.179.120.53:5000/removepair',
-            data: JSON.stringify({pairname: pairname}),
+            url: 'http://192.168.5.45:5000/removepair',
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            },
+            data: JSON.stringify({pairname: pairname, jwtToken: jwtToken}),
             dataType: 'json',
             contentType:"application/json",
             success: function(data) {
@@ -84,8 +100,11 @@ $(document).ready(function() {
 
 function get_data() {
     $.ajax({
-    url: "http://54.179.120.53:5000/getdata",
+    url: "http://192.168.5.45:5000/getdata",
     type: "GET",
+    headers: {
+        'Authorization': `Bearer ${jwtToken}`
+    },
     dataType: "json",
     success: function(data) {
         // Do something with the retrieved data
