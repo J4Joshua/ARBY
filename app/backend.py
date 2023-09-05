@@ -16,7 +16,7 @@ app.config["JWT_SECRET_KEY"] = "super-secret"
 jwt = JWTManager(app)
 
 
-cnx = mysql.connector.connect(user='admin', password='Arby_13245', host='arbydb.camodfosky75.ap-southeast-1.rds.amazonaws.com', database='ARBY')
+cnx = mysql.connector.connect(user='admin', password='admin123', host='arbydb.camodfosky75.ap-southeast-1.rds.amazonaws.com', database='ARBY')
 cursor = cnx.cursor()
 
 config = {
@@ -79,17 +79,9 @@ ENDPOINTS = {
     'ticker_price': '/ticker/price',
     'ticker_book': '/ticker/bookTicker'
 }
-# @cache.cached(timeout=300)
+
 def get_ticker_book(symbol_list):
     response_list = []
-    # for symbol in symbol_list :
-    #     params = {'symbol': symbol}
-    #     response = requests.get(BASE_URL + ENDPOINTS['ticker_book'], params=params)
-    #     response_data = response.json()
-    #     print(response_data)
-    #     if 'symbol' not in response_data:
-    #         return jsonify(status='error')
-    #     response_list.append(response_data)
     for symbol in symbol_list:
         cache_key = f'ticker_book_{symbol}'
         response_data = cache.get(cache_key)
@@ -103,7 +95,6 @@ def get_ticker_book(symbol_list):
             print('cached')
         response_list.append(response_data)
     return response_list
-    #return jsonify(rows=response_list,status='success')
 
 @app.route('/getdata')
 @jwt_required()

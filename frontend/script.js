@@ -11,7 +11,7 @@ $(document).ready(function() {
         $('#password').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://192.168.5.45:5000/check_user',
+            url: 'http://54.179.120.53/check_user',
             data: JSON.stringify({username: username, password: password, method: 'register'}),
             dataType: 'json',
             contentType:"application/json",
@@ -32,7 +32,7 @@ $(document).ready(function() {
         $('#password').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://192.168.5.45:5000/check_user',
+            url: 'http://54.179.120.53/check_user',
             data: JSON.stringify({username: username, password: password, method: 'login'}),
             dataType: 'json',
             contentType:"application/json",
@@ -58,7 +58,7 @@ $(document).ready(function() {
         $('#pairname').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://192.168.5.45:5000/addpair',
+            url: 'http://54.179.120.53/addpair',
             headers: {
                 'Authorization': `Bearer ${jwtToken}`
             },
@@ -80,7 +80,7 @@ $(document).ready(function() {
         $('#pairname').val("");
         $.ajax({
             type: 'POST',
-            url: 'http://192.168.5.45:5000/removepair',
+            url: 'http://54.179.120.53/removepair',
             headers: {
                 'Authorization': `Bearer ${jwtToken}`
             },
@@ -100,7 +100,7 @@ $(document).ready(function() {
 
 function get_data() {
     $.ajax({
-    url: "http://192.168.5.45:5000/getdata",
+    url: "http://54.179.120.53/getdata",
     type: "GET",
     headers: {
         'Authorization': `Bearer ${jwtToken}`
